@@ -1,0 +1,78 @@
+# ===============================
+# 🧱 Build (Maven)
+# ===============================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# ===============================
+# ☕ Java
+# ===============================
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# ===============================
+# 🔐 Environment / Secrets
+# ===============================
+.env
+*.env
+application-local.properties
+application-dev.properties
+
+# ===============================
+# 🧠 IDEs
+# ===============================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# ===============================
+# 🖥️ OS files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# 🧪 Test / Coverage
+# ===============================
+/coverage/
+*.exec
+
+# ===============================
+# 📦 Logs
+# ===============================
+logs/
+*.log
+
+# ===============================
+# 🚀 Spring Boot
+# ===============================
+/spring.log
+
+# ===============================
+# 🐳 Docker (se usar depois)
+# ===============================
+*.pid
+*.seed
+
+# ===============================
+# 🔄 Misc
+# ===============================
+*.swp
+*.swo
+*~
