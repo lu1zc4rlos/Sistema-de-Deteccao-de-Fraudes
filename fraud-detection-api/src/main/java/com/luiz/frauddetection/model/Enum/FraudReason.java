@@ -1,0 +1,21 @@
+package com.luiz.frauddetection.model.Enum;
+
+public enum FraudReason {
+
+    HIGH_AMOUNT,
+    AMOUNT_OUT_OF_PATTERN,
+
+    TOO_MANY_TRANSACTIONS,
+    RAPID_SEQUENCE,
+
+    UNUSUAL_LOCATION,
+    IMPOSSIBLE_TRAVEL,
+
+    UNKNOWN_DEVICE,
+    NEW_DEVICE,
+
+    BEHAVIOR_ANOMALY,
+
+    MULTIPLE_FAILED_ATTEMPTS,
+    SUSPICIOUS_LOGIN
+}
