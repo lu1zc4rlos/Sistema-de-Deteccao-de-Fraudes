@@ -8,7 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Table(name = "fraud_logs")
 @EntityListeners(AuditingEntityListener.class)
@@ -33,7 +32,7 @@ public class FraudLog {
     @Column(nullable = false)
     @NotNull(message = "A reason não pode ter user null")
     @NonNull
-    private List<FraudReason> reason;
+    private FraudReason reason;
 
     @Getter @Setter
     @CreatedDate
