@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 
 @Table(name = "fraud_logs")
 @EntityListeners(AuditingEntityListener.class)
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 public class FraudLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    private final Long id;
+    private Long id;
 
     @Getter @Setter
     @ManyToOne(fetch = FetchType.LAZY)
