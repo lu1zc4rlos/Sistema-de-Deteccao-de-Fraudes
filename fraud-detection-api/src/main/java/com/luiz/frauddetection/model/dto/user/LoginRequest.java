@@ -7,12 +7,12 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRequest {
+public class LoginRequest {
 
     @NotBlank
     @Email(message = "Email inválido")
     private String email;
 
     @NotBlank
-    private String senha;
+    private String password;
 }
