@@ -12,7 +12,7 @@ public class UserRegisterRequest {
 
     @NotBlank
     @Size(max = 100)
-    private String nome;
+    private String name;
 
     @NotBlank
     @Email(message = "Email inválido")
@@ -21,5 +21,5 @@ public class UserRegisterRequest {
     @NotBlank
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$",
             message = "A senha deve conter letras e números")
-    private String senha;
+    private String password;
 }
