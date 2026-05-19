@@ -12,6 +12,7 @@ import com.luiz.frauddetection.repository.FraudLogRepository;
 import com.luiz.frauddetection.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,19 +28,36 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
 
     @Transactional
-    public TransactionResponse createTransaction(TransactionRequest request, User user){
+    public TransactionResponse createTransaction(TransactionRequest request, User user) {
+        try {
+            Transaction transaction = transactionMapper.toEntity(request, user);
 
-        Transaction transaction = transactionMapper.toEntity(request, user);
-        FraudAnalysisResult fraudAnalysisResult = fraudAnalysisService.analyze(transaction);
+            FraudAnalysisResult fraudAnalysisResult = fraudAnalysisService.analyze(transaction);
 
-        transaction.setRiskScore(fraudAnalysisResult.getRiskScore());
-        transaction.setStatus(fraudAnalysisResult.getStatus());
-        transactionRepository.save(transaction);
+            transaction.setRiskScore(fraudAnalysisResult.getRiskScore());
+            transaction.setStatus(fraudAnalysisResult.getStatus());
 
-        List<FraudLog> fraudLogs = saveFraudLogs(transaction,fraudAnalysisResult);
-        TransactionResponse transactionResponse = transactionMapper.toResponse(transaction,fraudLogs);
+            transaction = transactionRepository.save(transaction);
 
-        return transactionResponse;
+            List<FraudLog> fraudLogs = saveFraudLogs(transaction, fraudAnalysisResult);
+
+            return transactionMapper.toResponse(transaction, fraudLogs);
+
+        } catch (DataIntegrityViolationException e) {
+            System.err.println("Erro de integridade de dados ao salvar a transação:");
+            e.printStackTrace();
+            throw e;
+
+        } catch (RuntimeException e) {
+            System.err.println("Erro de lógica ou integração no serviço de análise de fraude:");
+            e.printStackTrace();
+            throw e;
+
+        } catch (Exception e) {
+            System.err.println("Erro inesperado no fluxo de criação de transação:");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional

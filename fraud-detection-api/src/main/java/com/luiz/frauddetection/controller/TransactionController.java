@@ -24,17 +24,14 @@ import java.net.URI;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final UserRepository userRepository;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<TransactionResponse> createTransaction(
-            @RequestBody @Valid TransactionRequest request
-          /*  @AuthenticationPrincipal User authenticatedUser*/) {
-
-        User user = userRepository.findById(1L).get();
+            @RequestBody @Valid TransactionRequest request,
+            @AuthenticationPrincipal User authenticatedUser) {
 
         TransactionResponse response = transactionService
-                .createTransaction(request,user/*authenticatedUser*/);
+                .createTransaction(request,authenticatedUser);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
