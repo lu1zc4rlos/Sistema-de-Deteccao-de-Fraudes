@@ -5,6 +5,9 @@ import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.repository.UserRepository;
 import com.luiz.frauddetection.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +24,19 @@ import java.net.URI;
 @RestController
 @RequestMapping("/transactions")
 @RequiredArgsConstructor
+@Tag(name = "Transações", description = "Criação e análise de transações financeiras em tempo real")
 public class TransactionController {
 
     private final TransactionService transactionService;
 
+    @Operation(
+            summary = "Criar nova transação",
+            description = "Processa uma transação financeira, calcula o score de risco e retorna o resultado da análise de fraude. Requer autenticação JWT."
+    )
+    @ApiResponse(responseCode = "201", description = "Transação processada — aprovada, suspeita ou bloqueada")
+    @ApiResponse(responseCode = "400", description = "Dados da transação inválidos")
+    @ApiResponse(responseCode = "401", description = "Token JWT ausente ou expirado")
+    @ApiResponse(responseCode = "403", description = "Usuário bloqueado por suspeita de fraude")
     @PostMapping("/create")
     public ResponseEntity<TransactionResponse> createTransaction(
             @RequestBody @Valid TransactionRequest request,
