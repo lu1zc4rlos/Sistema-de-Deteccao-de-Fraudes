@@ -21,6 +21,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 @RestController
 @RequestMapping("/transactions")
 @RequiredArgsConstructor
@@ -28,6 +32,7 @@ import java.net.URI;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final UserRepository userRepository;
 
     @Operation(
             summary = "Criar nova transação",
@@ -52,5 +57,19 @@ public class TransactionController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @Operation(summary = "Obter histórico de transações", description = "Retorna todas as transações realizadas pelo usuário autenticado")
+    @GetMapping("/history")
+    public ResponseEntity<List<TransactionResponse>> getHistory(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        return ResponseEntity.ok(transactionService.getUserHistory(user));
+    }
+
+    @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
+    @GetMapping("/stats")
+    public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        return ResponseEntity.ok(transactionService.getUserStats(user));
     }
 }
