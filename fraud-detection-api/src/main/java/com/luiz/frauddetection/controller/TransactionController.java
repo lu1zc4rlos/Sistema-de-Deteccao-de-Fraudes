@@ -2,6 +2,7 @@ package com.luiz.frauddetection.controller;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
+import com.luiz.frauddetection.model.dto.user.UserSummary;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.repository.UserRepository;
 import com.luiz.frauddetection.service.TransactionService;
@@ -13,13 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
@@ -52,5 +51,25 @@ public class TransactionController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<TransactionResponse>> getAllByUser(
+            @AuthenticationPrincipal User authenticatedUser) {
+
+        List<TransactionResponse> transactions = transactionService.getUserTransactions(authenticatedUser);
+
+        return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionResponse> getByUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser) {
+
+        TransactionResponse transactionResponse = transactionService
+                .getUserTransaction(authenticatedUser, id);
+
+        return ResponseEntity.ok(transactionResponse);
     }
 }
