@@ -1,12 +1,11 @@
 package com.luiz.frauddetection.model.dto.transaction;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-@Data
 @Builder
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionStatsResponse {

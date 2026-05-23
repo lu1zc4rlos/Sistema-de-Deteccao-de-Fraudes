@@ -2,16 +2,13 @@ package com.luiz.frauddetection.controller;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
-import com.luiz.frauddetection.model.dto.user.UserSummary;
 import com.luiz.frauddetection.model.entity.User;
-import com.luiz.frauddetection.repository.UserRepository;
 import com.luiz.frauddetection.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +19,6 @@ import java.util.List;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
@@ -31,7 +27,6 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final UserRepository userRepository;
 
     @Operation(
             summary = "Criar nova transação",
@@ -60,10 +55,13 @@ public class TransactionController {
 
     @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
     @GetMapping("/stats")
-    public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
-        return ResponseEntity.ok(transactionService.getUserStats(user));
+    public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal User authenticatedUser) {
+
+        TransactionStatsResponse transactionStatsResponse = transactionService.getUserStats(authenticatedUser);
+
+        return ResponseEntity.ok(transactionStatsResponse);
     }
+
     @GetMapping("/")
     public ResponseEntity<List<TransactionResponse>> getAllByUser(
             @AuthenticationPrincipal User authenticatedUser) {
