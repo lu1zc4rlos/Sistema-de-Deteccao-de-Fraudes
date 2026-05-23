@@ -20,6 +20,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 @RestController
 @RequestMapping("/transactions")
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final UserRepository userRepository;
 
     @Operation(
             summary = "Criar nova transação",
@@ -53,6 +58,12 @@ public class TransactionController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
+    @GetMapping("/stats")
+    public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        return ResponseEntity.ok(transactionService.getUserStats(user));
+    }
     @GetMapping("/")
     public ResponseEntity<List<TransactionResponse>> getAllByUser(
             @AuthenticationPrincipal User authenticatedUser) {

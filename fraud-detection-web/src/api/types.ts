@@ -37,3 +37,12 @@ export interface TransactionResponse {
   status: Status;
   fraudLogs: FraudLogResponse[];
 }
+
+export interface TransactionStatsResponse {
+  totalTransactions: number;
+  totalAmount: number;
+  averageRiskScore: number;
+  approvedCount: number;
+  suspiciousCount: number;
+  blockedCount: number;
+}
