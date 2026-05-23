@@ -7,6 +7,7 @@ import com.luiz.frauddetection.model.Enum.FraudReason;
 import com.luiz.frauddetection.model.dto.fraudAnalysis.FraudAnalysisResult;
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
 import com.luiz.frauddetection.model.entity.FraudLog;
 import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
@@ -14,7 +15,6 @@ import com.luiz.frauddetection.repository.FraudLogRepository;
 import com.luiz.frauddetection.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,21 +45,15 @@ public class TransactionService {
 
             return transactionMapper.toResponse(transaction, fraudLogs);
 
-        } catch (DataIntegrityViolationException e) {
-            System.err.println("Erro de integridade de dados ao salvar a transação:");
-            e.printStackTrace();
-            throw e;
-
-        } catch (RuntimeException e) {
-            System.err.println("Erro de lógica ou integração no serviço de análise de fraude:");
-            e.printStackTrace();
-            throw e;
-
         } catch (Exception e) {
-            System.err.println("Erro inesperado no fluxo de criação de transação:");
-            e.printStackTrace();
+            System.err.println("Erro ao criar transação: " + e.getMessage());
             throw e;
         }
+    }
+
+    @Transactional
+    public TransactionStatsResponse getUserStats(User user) {
+        return transactionRepository.getStatsByUser(user);
     }
 
     @Transactional

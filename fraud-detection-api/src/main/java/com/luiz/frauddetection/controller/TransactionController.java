@@ -2,16 +2,13 @@ package com.luiz.frauddetection.controller;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
-import com.luiz.frauddetection.model.dto.user.UserSummary;
 import com.luiz.frauddetection.model.entity.User;
-import com.luiz.frauddetection.repository.UserRepository;
 import com.luiz.frauddetection.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +16,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/transactions")
@@ -53,6 +53,15 @@ public class TransactionController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
+    @GetMapping("/stats")
+    public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal User authenticatedUser) {
+
+        TransactionStatsResponse transactionStatsResponse = transactionService.getUserStats(authenticatedUser);
+
+        return ResponseEntity.ok(transactionStatsResponse);
+    }
+
     @GetMapping("/")
     public ResponseEntity<List<TransactionResponse>> getAllByUser(
             @AuthenticationPrincipal User authenticatedUser) {
@@ -72,4 +81,5 @@ public class TransactionController {
 
         return ResponseEntity.ok(transactionResponse);
     }
+
 }

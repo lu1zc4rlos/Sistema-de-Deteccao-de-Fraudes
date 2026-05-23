@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface FraudLogRepository extends JpaRepository<FraudLog, Long> {
     <S extends FraudLog> S save(S entity);
+    java.util.List<FraudLog> findByTransaction(com.luiz.frauddetection.model.entity.Transaction transaction);
     List<FraudLog> findByTransactionId(Long transactionId);
 }
