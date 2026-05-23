@@ -1,5 +1,7 @@
 package com.luiz.frauddetection.service;
 
+import com.luiz.frauddetection.config.exception.ForbiddenException;
+import com.luiz.frauddetection.config.exception.ResourceNotFoundException;
 import com.luiz.frauddetection.mapper.TransactionMapper;
 import com.luiz.frauddetection.model.Enum.FraudReason;
 import com.luiz.frauddetection.model.dto.fraudAnalysis.FraudAnalysisResult;
@@ -112,5 +114,31 @@ public class TransactionService {
             fraudLogs.add(fraudLogRepository.save(fraudLog));
         }
         return fraudLogs;
+    }
+
+    public List<TransactionResponse> getUserTransactions(User user){
+
+        List<Transaction> transactions = transactionRepository.findByUser(user);
+
+        return transactions.stream()
+                .map(transaction -> {
+                    List<FraudLog> fraudLogs = fraudLogRepository.findByTransactionId(transaction.getId());
+                    return transactionMapper.toResponse(transaction, fraudLogs);
+                })
+                .toList();
+    }
+
+    public TransactionResponse getUserTransaction(User user, Long transactionId){
+
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket não encontrado."));
+
+        List<FraudLog> fraudLogs = fraudLogRepository.findByTransactionId(transaction.getId());
+
+        if (!transaction.getUser().getId().equals(user.getId())) {
+            throw new ForbiddenException("Acesso negado. Essa transaction não pertence a este cliente.");
+        }
+
+        return transactionMapper.toResponse(transaction, fraudLogs);
     }
 }

@@ -1,10 +1,12 @@
 package com.luiz.frauddetection.service;
 
 import com.luiz.frauddetection.config.exception.ConflictException;
+import com.luiz.frauddetection.config.exception.ResourceNotFoundException;
 import com.luiz.frauddetection.mapper.UserMapper;
 import com.luiz.frauddetection.model.dto.user.LoginRequest;
 import com.luiz.frauddetection.model.dto.user.UserRegisterRequest;
 import com.luiz.frauddetection.model.dto.user.UserResponse;
+import com.luiz.frauddetection.model.dto.user.UserSummary;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +96,14 @@ public class AuthService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public UserResponse getUserProfile(User authenticatedUser){
+
+        User user = userRepository.findById(authenticatedUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        return userMapper.toResponse(user,null,null);
     }
 
 }

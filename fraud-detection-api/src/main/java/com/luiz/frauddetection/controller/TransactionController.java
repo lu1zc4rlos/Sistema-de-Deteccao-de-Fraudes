@@ -2,6 +2,7 @@ package com.luiz.frauddetection.controller;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
+import com.luiz.frauddetection.model.dto.user.UserSummary;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.repository.UserRepository;
 import com.luiz.frauddetection.service.TransactionService;
@@ -13,13 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
 import org.springframework.web.bind.annotation.*;
@@ -59,17 +58,30 @@ public class TransactionController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @Operation(summary = "Obter histórico de transações", description = "Retorna todas as transações realizadas pelo usuário autenticado")
-    @GetMapping("/history")
-    public ResponseEntity<List<TransactionResponse>> getHistory(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
-        return ResponseEntity.ok(transactionService.getUserHistory(user));
-    }
-
     @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
     @GetMapping("/stats")
     public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
         return ResponseEntity.ok(transactionService.getUserStats(user));
     }
+    @GetMapping("/")
+    public ResponseEntity<List<TransactionResponse>> getAllByUser(
+            @AuthenticationPrincipal User authenticatedUser) {
+
+        List<TransactionResponse> transactions = transactionService.getUserTransactions(authenticatedUser);
+
+        return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TransactionResponse> getByUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser) {
+
+        TransactionResponse transactionResponse = transactionService
+                .getUserTransaction(authenticatedUser, id);
+
+        return ResponseEntity.ok(transactionResponse);
+    }
+
 }
