@@ -1,11 +1,13 @@
 package com.luiz.frauddetection.mapper;
 
 import com.luiz.frauddetection.model.Enum.Role;
-import com.luiz.frauddetection.model.dto.user.UserRegisterRequest;
-import com.luiz.frauddetection.model.dto.user.UserResponse;
-import com.luiz.frauddetection.model.dto.user.UserSummary;
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import com.luiz.frauddetection.model.dto.user.*;
+import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -35,6 +37,36 @@ public class UserMapper {
                 .role(user.getRole())
                 .build()
 
+        );
+
+        return response;
+    }
+
+    public UserAdminResponse toAdminResponse(User user, TransactionStatsResponse stats){
+
+        UserAdminResponse userAdminResponse = new UserAdminResponse();
+        userAdminResponse.setId(user.getId());
+        userAdminResponse.setName(user.getName());
+        userAdminResponse.setEmail(user.getEmail());
+        userAdminResponse.setRole(String.valueOf(user.getRole()));
+        userAdminResponse.setIsLocked(user.getIsLocked());
+        userAdminResponse.setStats(stats);
+
+        return userAdminResponse;
+    }
+
+    public UserSummaryAdminResponse toSummaryAdminResponse(User user, List<Transaction> transactions) {
+        UserSummaryAdminResponse response = new UserSummaryAdminResponse();
+        response.setId(user.getId());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(String.valueOf(user.getRole()));
+        response.setIsLocked(user.getIsLocked());
+        response.setTotalTransactions((long) transactions.size());
+        response.setFlaggedTransactions(
+                transactions.stream()
+                        .filter(t -> !"APPROVED".equals(t.getStatus()))
+                        .count()
         );
 
         return response;
