@@ -3,15 +3,17 @@ package com.luiz.frauddetection.service;
 import com.luiz.frauddetection.config.exception.ConflictException;
 import com.luiz.frauddetection.config.exception.ResourceNotFoundException;
 import com.luiz.frauddetection.mapper.UserMapper;
-import com.luiz.frauddetection.model.dto.user.LoginRequest;
-import com.luiz.frauddetection.model.dto.user.UserRegisterRequest;
-import com.luiz.frauddetection.model.dto.user.UserResponse;
-import com.luiz.frauddetection.model.dto.user.UserSummary;
+import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import com.luiz.frauddetection.model.dto.user.*;
+import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
+import com.luiz.frauddetection.repository.TransactionRepository;
 import com.luiz.frauddetection.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -22,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -29,8 +33,10 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final TransactionService transactionService;
 
     @Value("${api.security.token.expiration}")
     private Long expirationTime;
@@ -104,6 +110,24 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         return userMapper.toResponse(user,null,null);
+    }
+
+    public UserAdminResponse getUserDetails(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        TransactionStatsResponse stats = transactionService.getUserStats(user);
+
+        return userMapper.toAdminResponse(user, stats);
+    }
+
+    public Page<UserSummaryAdminResponse> getAllUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+
+        return users.map(user -> {
+            List<Transaction> transactions = transactionRepository.findByUser(user);
+            return userMapper.toSummaryAdminResponse(user, transactions);
+        });
     }
 
 }
