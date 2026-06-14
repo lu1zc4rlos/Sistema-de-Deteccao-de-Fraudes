@@ -2,6 +2,7 @@ package com.luiz.frauddetection.mapper;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
+import com.luiz.frauddetection.model.dto.transaction.TransactionSummaryAdminResponse;
 import com.luiz.frauddetection.model.entity.FraudLog;
 import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
@@ -44,5 +45,20 @@ public class TransactionMapper {
         );
 
         return transactionResponse;
+    }
+
+    public TransactionSummaryAdminResponse toSummaryAdminResponse(Transaction transaction, User user){
+        TransactionSummaryAdminResponse response = new TransactionSummaryAdminResponse();
+        response.setId(transaction.getId());
+        response.setUserName(user.getName());
+        response.setUserEmail(user.getEmail());
+        response.setAmount(transaction.getAmount());
+        response.setLocation(transaction.getLocation());
+        response.setDevice(transaction.getDevice());
+        response.setTransactionTime(transaction.getTransactionTime());
+        response.setRiskScore(transaction.getRiskScore());
+        response.setStatus(transaction.getStatus());
+
+        return response;
     }
 }

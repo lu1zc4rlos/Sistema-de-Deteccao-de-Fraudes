@@ -3,6 +3,8 @@ package com.luiz.frauddetection.repository;
 import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
 import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 """
     )
     TransactionStatsResponse getStatsByUser(@Param("user") User user);
+
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.user")
+    Page<Transaction> findAllWithUser(Pageable pageable);
 }

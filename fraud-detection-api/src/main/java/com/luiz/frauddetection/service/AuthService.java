@@ -130,4 +130,12 @@ public class AuthService {
         });
     }
 
+    public void updateUserLockStatus(Long userId, UserLockRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        user.setIsLocked(request.getLocked());
+        userRepository.save(user);
+    }
+
 }
