@@ -2,6 +2,7 @@ package com.luiz.frauddetection.controller;
 
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
+import com.luiz.frauddetection.model.dto.transaction.TransactionSummaryAdminResponse;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -80,6 +84,22 @@ public class TransactionController {
                 .getUserTransaction(authenticatedUser, id);
 
         return ResponseEntity.ok(transactionResponse);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<Page<TransactionSummaryAdminResponse>> getAllTransactions(
+            Pageable pageable,
+            @AuthenticationPrincipal User authenticatedUser) {
+        return ResponseEntity.ok(transactionService.getAllTransactions(pageable));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/admin")
+    public ResponseEntity<TransactionResponse> getUserTransactionAdmin(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser) {
+        return ResponseEntity.ok(transactionService.getUserTransactionAdmin(id));
     }
 
 }

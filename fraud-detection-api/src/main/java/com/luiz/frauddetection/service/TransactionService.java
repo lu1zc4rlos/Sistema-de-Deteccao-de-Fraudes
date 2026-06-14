@@ -8,13 +8,18 @@ import com.luiz.frauddetection.model.dto.fraudAnalysis.FraudAnalysisResult;
 import com.luiz.frauddetection.model.dto.transaction.TransactionRequest;
 import com.luiz.frauddetection.model.dto.transaction.TransactionResponse;
 import com.luiz.frauddetection.model.dto.transaction.TransactionStatsResponse;
+import com.luiz.frauddetection.model.dto.transaction.TransactionSummaryAdminResponse;
+import com.luiz.frauddetection.model.dto.user.UserSummaryAdminResponse;
 import com.luiz.frauddetection.model.entity.FraudLog;
 import com.luiz.frauddetection.model.entity.Transaction;
 import com.luiz.frauddetection.model.entity.User;
 import com.luiz.frauddetection.repository.FraudLogRepository;
 import com.luiz.frauddetection.repository.TransactionRepository;
+import com.luiz.frauddetection.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -98,5 +103,23 @@ public class TransactionService {
         }
 
         return transactionMapper.toResponse(transaction, fraudLogs);
+    }
+
+    public TransactionResponse getUserTransactionAdmin(Long transactionId){
+
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket não encontrado."));
+
+        List<FraudLog> fraudLogs = fraudLogRepository.findByTransactionId(transaction.getId());
+
+        return transactionMapper.toResponse(transaction, fraudLogs);
+    }
+
+    public Page<TransactionSummaryAdminResponse> getAllTransactions(Pageable pageable) {
+        Page<Transaction> transactions = transactionRepository.findAllWithUser(pageable);
+
+        return transactions.map(transaction -> {
+            return transactionMapper.toSummaryAdminResponse(transaction, transaction.getUser());
+        });
     }
 }

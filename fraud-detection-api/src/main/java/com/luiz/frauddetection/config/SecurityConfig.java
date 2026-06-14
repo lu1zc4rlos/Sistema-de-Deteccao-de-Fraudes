@@ -70,6 +70,9 @@ public class SecurityConfig {
                         // Rotas de admin
                         .requestMatchers("/users/{id}").hasRole("ADMIN")
                         .requestMatchers("/users/all").hasRole("ADMIN")
+                        .requestMatchers("/users/{id}/lock").hasRole("ADMIN")
+                        .requestMatchers("/transactions/all").hasRole("ADMIN")
+                        .requestMatchers("/transactions/{id}/admin").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
