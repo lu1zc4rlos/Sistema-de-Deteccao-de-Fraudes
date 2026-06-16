@@ -57,7 +57,12 @@ public class TransactionController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @Operation(summary = "Obter estatísticas de fraude", description = "Retorna estatísticas consolidadas das transações do usuário")
+    @Operation(
+            summary = "Estatísticas do usuário",
+            description = "Retorna estatísticas consolidadas das transações do usuário autenticado"
+    )
+    @ApiResponse(responseCode = "200", description = "Estatísticas retornadas com sucesso")
+    @ApiResponse(responseCode = "401", description = "Token JWT ausente ou expirado")
     @GetMapping("/stats")
     public ResponseEntity<TransactionStatsResponse> getStats(@AuthenticationPrincipal User authenticatedUser) {
 
@@ -66,6 +71,12 @@ public class TransactionController {
         return ResponseEntity.ok(transactionStatsResponse);
     }
 
+    @Operation(
+            summary = "Listar transações do usuário",
+            description = "Retorna todas as transações do usuário autenticado com seus fraud logs"
+    )
+    @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    @ApiResponse(responseCode = "401", description = "Token JWT ausente ou expirado")
     @GetMapping("/")
     public ResponseEntity<List<TransactionResponse>> getAllByUser(
             @AuthenticationPrincipal User authenticatedUser) {
@@ -75,6 +86,13 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+    @Operation(
+            summary = "Detalhe de uma transação",
+            description = "Retorna os dados completos de uma transação específica do usuário autenticado"
+    )
+    @ApiResponse(responseCode = "200", description = "Transação encontrada")
+    @ApiResponse(responseCode = "403", description = "Transação não pertence ao usuário autenticado")
+    @ApiResponse(responseCode = "404", description = "Transação não encontrada")
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponse> getByUser(
             @PathVariable Long id,
@@ -86,6 +104,12 @@ public class TransactionController {
         return ResponseEntity.ok(transactionResponse);
     }
 
+    @Operation(
+            summary = "Listar todas as transações (admin)",
+            description = "Retorna todas as transações do sistema de forma paginada. Requer ROLE_ADMIN."
+    )
+    @ApiResponse(responseCode = "200", description = "Lista paginada retornada com sucesso")
+    @ApiResponse(responseCode = "403", description = "Acesso negado — requer ROLE_ADMIN")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<Page<TransactionSummaryAdminResponse>> getAllTransactions(
@@ -94,6 +118,13 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getAllTransactions(pageable));
     }
 
+    @Operation(
+            summary = "Detalhe de qualquer transação (admin)",
+            description = "Retorna os dados completos de qualquer transação pelo ID, sem restrição de dono. Requer ROLE_ADMIN."
+    )
+    @ApiResponse(responseCode = "200", description = "Transação encontrada")
+    @ApiResponse(responseCode = "403", description = "Acesso negado — requer ROLE_ADMIN")
+    @ApiResponse(responseCode = "404", description = "Transação não encontrada")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/admin")
     public ResponseEntity<TransactionResponse> getUserTransactionAdmin(
