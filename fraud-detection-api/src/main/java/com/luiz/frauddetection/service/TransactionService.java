@@ -62,7 +62,7 @@ public class TransactionService {
     }
 
     @Transactional
-    private List<FraudLog> saveFraudLogs(Transaction transaction, FraudAnalysisResult fraudAnalysisResult){
+    protected List<FraudLog> saveFraudLogs(Transaction transaction, FraudAnalysisResult fraudAnalysisResult){
 
         List<FraudLog> fraudLogs = new ArrayList<>();
 

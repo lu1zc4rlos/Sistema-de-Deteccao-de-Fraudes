@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // Libera arquivos estáticos e raiz
-                        .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/", "/index.html", "/assets/**", "/vite.svg", "/*.ico").permitAll()
 
                         // Rotas públicas
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
