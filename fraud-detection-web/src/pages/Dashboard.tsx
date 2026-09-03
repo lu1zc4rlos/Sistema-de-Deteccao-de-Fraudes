@@ -240,7 +240,7 @@ const Dashboard: React.FC = () => {
                 <select value={device} onChange={(e) => setDevice(e.target.value as Device)}>
                   <option value="MOBILE">📱 Mobile</option>
                   <option value="DESKTOP">💻 Desktop</option>
-                  <option value="TABLET">平板 Tablet</option>
+                  <option value="TABLET">📱 Tablet</option>
                   <option value="NEW_DEVICE">✨ Novo Device</option>
                   <option value="UNKNOWN">❓ Desconhecido</option>
                 </select>
